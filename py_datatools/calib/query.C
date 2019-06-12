@@ -153,15 +153,18 @@ void query(Int_t year=2016, Int_t run=265377)
   cout << " Cavern pressure : " << runinfo.cavern_pressure << endl;
 
 
-  for (int i=0; i<10; i++) {
-    cout << "chamber " << i << endl;
-    cout << "      anode voltage : " << runinfo.anode_voltage[i] << endl;
-    cout << "      drift voltage : " << runinfo.drift_voltage[i] << endl;
-    cout << "               gain : " << runinfo.gain[i] << endl;
-    cout << "     drift velocity : " << runinfo.vdrift[i] << endl;
-    cout << "                ExB : " << runinfo.ExB[i] << endl;
+  for (int i=0; i<540; i++) {
 
-    myfile << i << ", " << runinfo.gain[i] << std::endl;
+    if (i < 5) {
+        cout << "chamber " << i << endl;
+        cout << "      anode voltage : " << runinfo.anode_voltage[i] << endl;
+        cout << "      drift voltage : " << runinfo.drift_voltage[i] << endl;
+        cout << "               gain : " << runinfo.gain[i] << endl;
+        cout << "     drift velocity : " << runinfo.vdrift[i] << endl;
+        cout << "                ExB : " << runinfo.ExB[i] << endl;
+    }
+
+    myfile << i << ", " << runinfo.anode_voltage[i] << ", " << runinfo.drift_voltage[i] << ", " << runinfo.gain[i] << ", " << runinfo.vdrift[i] << ", " << runinfo.ExB[i] << std::endl;
   }
 
   myfile.close();

@@ -161,7 +161,7 @@ void query(Int_t year=2016, Int_t run=265377)
     cout << "     drift velocity : " << runinfo.vdrift[i] << endl;
     cout << "                ExB : " << runinfo.ExB[i] << endl;
 
-    myfile << i << ", " << runinfo.gain[i];
+    myfile << i << ", " << runinfo.gain[i] << std::endl;
   }
 
   myfile.close();

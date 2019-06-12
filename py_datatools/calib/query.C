@@ -54,7 +54,7 @@ void query(Int_t year=2016, Int_t run=265377)
 {
 
     ofstream myfile;
-    myfile.open("example.txt");
+    myfile.open(Form("calib_files/%d_%d.txt", year, run));
 
   // set up the connection to the OCDB
   AliCDBManager* man = AliCDBManager::Instance();

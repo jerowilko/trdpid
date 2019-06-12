@@ -26,7 +26,7 @@ A track numpy array is a n x 6 x (settings.tracklet_shape) array of float32 numb
 
 An info_set contains all the associated information about a track in the form of a 16 length numpy array arranged as follows:
 
-label, num_tracklets, tracklet1_present, tracklet2_present, tracklet3_present, tracklet4_present, tracklet5_present, tracklet6_present, nsigmae, nsigmap, PT, dEdX, P, eta, theta, phi.
+label, nsigmae, nsigmap, PT, dEdX, P, eta, theta, phi, event V0trackID, track, num_tracklets, tracklet1_present, tracklet2_present, tracklet3_present, tracklet4_present, tracklet5_present, tracklet6_present.
 
 The tracks and info_sets of a dataset are spread out over 1 or many files each with the naming convention 'i_tracks.npy' and 'i_info_set.npy'. The reason for this is primarily for future memory considerations.
 

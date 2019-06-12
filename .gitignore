@@ -6,5 +6,6 @@
 .idea
 raw_data/
 datasets/
+recursive_units/
 .DS_Store
 *.pyc

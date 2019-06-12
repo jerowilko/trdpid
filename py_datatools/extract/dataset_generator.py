@@ -8,18 +8,18 @@ A dataset in this context constitutes a directory containing 3 things:
 2. The same as above number of info_set numpy arrays (See below).
 3. A single info.yaml file to help read the dataset.
 
-An info_set contains all the associated information about a track in the form of a 16 length numpy array formatted as follow
+An info_set contains all the associated information about a track in the form of a 19 length numpy array formatted as follow
 
-label, num_tracklets, tracklet1_present, tracklet2_present, tracklet3_present, tracklet4_present, tracklet5_present, tracklet6_present, nsigmae, nsigmap, PT, dEdX, P, eta, theta, phi
+label, nsigmae, nsigmap, PT, dEdX, P, eta, theta, phi, event, V0trackID,  track, num_tracklets, tracklet_1_pres, tracklet_2_pres, tracklet_3_pres, tracklet_4_pres, tracklet_5_pres, tracklet_6_pres
 
 The tracks and info_sets of a dataset are spreak out over 1 or many files each with the naming convention 'i_tracks.npy'
 and 'i_info_set.npy.'
 """
 
 import argparse, sys, os, shutil
-import settings
+from py_datatools import settings
 import numpy as np
-import yaml
+import argparse, sys, os, shutil, yaml
 
 #Usage python3 extract/dataset_generator.py train_small 10000 10000 4 note that num_electrons=-1, num_pions=-1 will result in all being exported.
 
@@ -50,6 +50,7 @@ for r, d, f in os.walk(settings.python_dicts_directory):
     for file in f:
         if 'pythonDict.txt' in file:
             files.append(os.path.join(r, file))
+files.sort()
 
 #Info set structure
 #label, num_tracklets, tracklet1_present, tracklet2_present, tracklet3_present, tracklet4_present, tracklet5_present, trackletsettings.num_tracklets_in_track_present, nsigmae, nsigmap, PT, dEdX, P, eta, theta, phi
@@ -83,8 +84,29 @@ for i, fil in enumerate(files):
                     export=False
             else:
                 print('UNRECOGNIZED pdgCode %d' % track['pdgCode'])
-            num_tracklets = np.sum(['layer' in key for key in track.keys()])
-            present_map = ['layer %d' % i in track for i in range(settings.num_tracklets_in_track)]
+                export=False
+
+            present_map = []
+            dets = []
+            rows = []
+            cols = []
+
+            for i in range(settings.num_tracklets_in_track):
+                if 'layer %d' % i in track and np.sum(np.asarray(track['layer %d' % i], dtype='float32')) > 1.0:
+                    present_map.append(1.0)
+                    dets.append(track['det%d' % i])
+                    rows.append(track['row%d' % i])
+                    cols.append(track['col%d' % i])
+                else:
+                    present_map.append(0.0)
+                    dets.append(-1.0)
+                    rows.append(-1.0)
+                    cols.append(-1.0)
+                    
+            num_tracklets = int(sum(present_map))
+            event = track['Event']
+            trackid = track['V0TrackID']
+            trackval = track['track']
             nsigmae = track['nSigmaElectron']
             nsigmap = track['nSigmaPion']
             PT = track['PT']
@@ -93,6 +115,7 @@ for i, fil in enumerate(files):
             eta = track['Eta']
             theta = track['Theta']
             phi = track['Phi']
+            run_number = track['RunNumber']
 
             if args.minp is not None and args.minp > P:
                 export = False
@@ -109,21 +132,25 @@ for i, fil in enumerate(files):
 
                     assert arr.shape == settings.tracklet_shape
 
-                    if np.sum(arr) < 1e-4:
-                        export_tracklet = False
-
                     tracklet_data_set[track_count % args.num_tracks_per_file][track_no] = arr
                     info_set[track_count % args.num_tracks_per_file][0] = label
-                    info_set[track_count % args.num_tracks_per_file][1] = num_tracklets
-                    info_set[track_count % args.num_tracks_per_file][2:8] = present_map
-                    info_set[track_count % args.num_tracks_per_file][8] = nsigmae
-                    info_set[track_count % args.num_tracks_per_file][9] = nsigmap
-                    info_set[track_count % args.num_tracks_per_file][10] = PT
-                    info_set[track_count % args.num_tracks_per_file][11] = dEdX
-                    info_set[track_count % args.num_tracks_per_file][12] = P
-                    info_set[track_count % args.num_tracks_per_file][13] = eta
-                    info_set[track_count % args.num_tracks_per_file][14] = theta
-                    info_set[track_count % args.num_tracks_per_file][15] = phi
+                    info_set[track_count % args.num_tracks_per_file][1] = nsigmae
+                    info_set[track_count % args.num_tracks_per_file][2] = nsigmap
+                    info_set[track_count % args.num_tracks_per_file][3] = PT
+                    info_set[track_count % args.num_tracks_per_file][4] = dEdX
+                    info_set[track_count % args.num_tracks_per_file][5] = P
+                    info_set[track_count % args.num_tracks_per_file][6] = eta
+                    info_set[track_count % args.num_tracks_per_file][7] = theta
+                    info_set[track_count % args.num_tracks_per_file][8] = phi
+                    info_set[track_count % args.num_tracks_per_file][9] = event
+                    info_set[track_count % args.num_tracks_per_file][10] = trackid
+                    info_set[track_count % args.num_tracks_per_file][11] = trackval
+                    info_set[track_count % args.num_tracks_per_file][12] = num_tracklets
+                    info_set[track_count % args.num_tracks_per_file][13] = run_number
+                    info_set[track_count % args.num_tracks_per_file][14:20] = dets
+                    info_set[track_count % args.num_tracks_per_file][21:27] = rows
+                    info_set[track_count % args.num_tracks_per_file][28:34] = cols
+                    info_set[track_count % args.num_tracks_per_file][35:41] = present_map
 
                 if label == 1:
                     e_count += 1

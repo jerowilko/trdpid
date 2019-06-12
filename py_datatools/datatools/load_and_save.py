@@ -1,5 +1,5 @@
 import numpy as np
-import settings
+from .. import settings
 import yaml
 import os, shutil
 
@@ -46,8 +46,12 @@ def save_dataset(name, tracks, info_set, tracks_per_file, datasets_home_director
 	delete_and_create_dataset_folder(name, datasets_home_directory)
 
 	for i in range(info['num_save_files']):
-		tracks_part = tracks[i*tracks_per_file:(i+1)*tracks_per_file]
-		info_set_part = info_set[i*tracks_per_file:(i+1)*tracks_per_file]
+		if tracks_per_file > 0:
+			tracks_part = tracks[i*tracks_per_file:(i+1)*tracks_per_file]
+			info_set_part = info_set[i*tracks_per_file:(i+1)*tracks_per_file]
+		else:
+			tracks_part = tracks
+			info_set_part = info_set
 
 		np.save(output_folder + '%d_tracks.npy' % i, tracks_part)
 		np.save(output_folder + '%d_info_set.npy' % i, info_set_part)

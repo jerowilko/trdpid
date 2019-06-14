@@ -48,7 +48,7 @@ class ComplexConvTrackletPID(SuperModel):
 	def __init__(self):
 		super(ComplexConvTrackletPID, self).__init__()
 		self.conv_model = tf.keras.Sequential([
-			tf.keras.layers.GaussianNoise(0.1),
+			# tf.keras.layers.GaussianNoise(0.1),
 			tf.keras.layers.Conv2D(filters=15, kernel_size=(3, 4), strides=1, use_bias=True,
 								   bias_initializer='normal',
 								   activation='relu', padding='same', ),
@@ -89,9 +89,9 @@ class PartialTrackletConvPID(SuperModel):
 	def __init__(self):
 		super(PartialTrackletConvPID, self).__init__()
 		self.conv_model = tf.keras.Sequential([
-			tf.keras.layers.Conv2D(filters=1, kernel_size=(5, 4), strides=[1,1], use_bias=False,
+			tf.keras.layers.Conv2D(filters=5, kernel_size=(17, 3), strides=[1,1], use_bias=False,
 								   bias_initializer='normal',
-								   activation='sigmoid', padding='valid', ),
+								   activation='relu', padding='valid', ),
 			tf.keras.layers.Flatten(),
 		])
 

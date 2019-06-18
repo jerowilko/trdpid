@@ -10,3 +10,4 @@ recursive_units/
 .DS_Store
 *.pyc
 calib_files/
+krypton_events/

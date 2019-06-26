@@ -163,8 +163,8 @@ for i, fil in enumerate(files):
 
             if (export and track_count % args.num_tracks_per_file == 0) or (e_count==args.num_electrons and p_count==args.num_pions):
                 print('Saving %s' % (output_folder + '%d_*.npy' % (save_count)))
-                np.save(output_folder + "%d_tracks.npy" % (save_count), tracklet_data_set[:track_count])
-                np.save(output_folder + "%d_info_set.npy" % (save_count), info_set[:track_count])
+                np.save(abspath(output_folder + "/%d_tracks.npy" % (save_count)), tracklet_data_set[:track_count])
+                np.save(abspath(output_folder + "/%d_info_set.npy" % (save_count)), info_set[:track_count])
 
                 track_count = 0
                 save_count += 1

@@ -20,7 +20,7 @@ def delete_and_create_dataset_folder(name, datasets_home_directory=settings.data
 	os.mkdir(output_folder)
 
 def load_whole_named_dataset(name, datasets_home_directory=settings.datasets_home_directory):
-	dataset_path = abspath(datasets_home_directory + name + '/')
+	dataset_path = datasets_home_directory + name + '/'
 
 	info = yaml.load(open(dataset_path + 'info.yaml'), Loader=yaml.Loader)
 
@@ -29,8 +29,8 @@ def load_whole_named_dataset(name, datasets_home_directory=settings.datasets_hom
 	total_loaded = 0
 
 	for i in range(info['num_save_files']):
-		tracks_part = np.load(dataset_path + '%d_tracks.npy' % i)
-		info_set_part = np.load(dataset_path + '%d_info_set.npy' % i)
+		tracks_part = np.load(abspath(dataset_path + '%d_tracks.npy') % i)
+		info_set_part = np.load(abspath(dataset_path + '%d_info_set.npy') % i)
 		tracks[total_loaded:total_loaded + tracks_part.shape[0]] = tracks_part
 		info_set[total_loaded:total_loaded + info_set_part.shape[0]] = info_set_part
 		total_loaded += tracks_part.shape[0]
@@ -40,7 +40,7 @@ def load_whole_named_dataset(name, datasets_home_directory=settings.datasets_hom
 	return tracks, info_set
 
 def save_dataset(name, tracks, info_set, tracks_per_file, datasets_home_directory=settings.datasets_home_directory):
-	output_folder = abspath(datasets_home_directory + name + '/')
+	output_folder = datasets_home_directory + name + '/'
 
 	info = get_dataset_info(tracks, info_set, tracks_per_file)
 
@@ -54,8 +54,8 @@ def save_dataset(name, tracks, info_set, tracks_per_file, datasets_home_director
 			tracks_part = tracks
 			info_set_part = info_set
 
-		np.save(output_folder + '%d_tracks.npy' % i, tracks_part)
-		np.save(output_folder + '%d_info_set.npy' % i, info_set_part)
+		np.save(abspath(output_folder + '%d_tracks.npy' % i), tracks_part)
+		np.save(abspath(output_folder + '%d_info_set.npy' % i), info_set_part)
 
 	yaml.dump(info, open(output_folder + 'info.yaml', 'w'), Dumper=yaml.Dumper)
 	return info

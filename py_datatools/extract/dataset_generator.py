@@ -20,6 +20,7 @@ import argparse, sys, os, shutil
 from py_datatools import settings
 import numpy as np
 import argparse, sys, os, shutil, yaml
+from os.path import abspath
 
 #Usage python3 extract/dataset_generator.py train_small 10000 10000 4 note that num_electrons=-1, num_pions=-1 will result in all being exported.
 
@@ -39,7 +40,7 @@ parser.add_argument('--num_tracks_per_file', type=int, help='Partition dataset u
 
 args=parser.parse_args()
 
-output_folder = settings.datasets_home_directory + '%s/' % args.name
+output_folder = abspath(settings.datasets_home_directory + '%s/' % args.name)
 
 if os.path.exists(output_folder) and os.path.isdir(output_folder):
     shutil.rmtree(output_folder)

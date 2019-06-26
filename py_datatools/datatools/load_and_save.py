@@ -2,6 +2,7 @@ import numpy as np
 from .. import settings
 import yaml
 import os, shutil
+from os.path import abspath
 
 def get_dataset_info(tracks, info_set, tracks_per_file):
 	info = {}
@@ -13,13 +14,13 @@ def get_dataset_info(tracks, info_set, tracks_per_file):
 	return info
 
 def delete_and_create_dataset_folder(name, datasets_home_directory=settings.datasets_home_directory):
-	output_folder = datasets_home_directory + name + '/'
+	output_folder = abspath(datasets_home_directory + name + '/')
 	if os.path.exists(output_folder) and os.path.isdir(output_folder):
 		shutil.rmtree(output_folder)
 	os.mkdir(output_folder)
 
 def load_whole_named_dataset(name, datasets_home_directory=settings.datasets_home_directory):
-	dataset_path = datasets_home_directory + name + '/'
+	dataset_path = abspath(datasets_home_directory + name + '/')
 
 	info = yaml.load(open(dataset_path + 'info.yaml'), Loader=yaml.Loader)
 
@@ -39,7 +40,7 @@ def load_whole_named_dataset(name, datasets_home_directory=settings.datasets_hom
 	return tracks, info_set
 
 def save_dataset(name, tracks, info_set, tracks_per_file, datasets_home_directory=settings.datasets_home_directory):
-	output_folder = datasets_home_directory + name + '/'
+	output_folder = abspath(datasets_home_directory + name + '/')
 
 	info = get_dataset_info(tracks, info_set, tracks_per_file)
 

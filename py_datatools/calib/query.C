@@ -43,6 +43,8 @@ struct runinfo_t
   float anode_voltage[540];
   float drift_voltage[540];
 
+  float local_gain_factor[540][16][144];
+
   float gain[540];
   float vdrift[540];
   float ExB[540];
@@ -53,8 +55,11 @@ struct runinfo_t
 void query(Int_t year=2016, Int_t run=265377)
 {
 
-    ofstream myfile;
-    myfile.open(Form("calib_files/%d_%d.txt", year, run));
+    ofstream chamber_info_file;
+    chamber_info_file.open(Form("calib_files/chamber_info_%d_%d.txt", year, run));
+
+    ofstream local_gains_file;
+    local_gains_file.open(Form("calib_files/local_gains_%d_%d.txt", year, run));
 
   // set up the connection to the OCDB
   AliCDBManager* man = AliCDBManager::Instance();
@@ -147,25 +152,53 @@ void query(Int_t year=2016, Int_t run=265377)
     runinfo.ExB[i] = exb->GetValue(i);
   }
 
+  entry = man->Get("TRD/Calib/LocalGainFactor", run);
+  AliTRDCalPad* loc = (AliTRDCalPad*)entry->GetObject();
+
+  for (int d=0; d<540; d++) {
+    AliTRDCalROC *det_cal_roc = loc->GetCalROC(d);
+    for (int r=0; r<16; r++) {
+      for (int c=0; c<144; c++) {
+        if (r >= det_cal_roc->GetNrows()) {
+            runinfo.local_gain_factor[d][r][c] = 1.0;
+            continue;
+        }
+        runinfo.local_gain_factor[d][r][c] = det_cal_roc->GetValue(c,r);
+      }
+    }
+  }
 
   cout << "      Start time : " << runinfo.start_time << endl;
   cout << "        End time : " << runinfo.end_time << endl;
   cout << " Cavern pressure : " << runinfo.cavern_pressure << endl;
 
 
-  for (int i=0; i<540; i++) {
+  for (int d=0; d<540; d++) {
 
-    if (i < 5) {
-        cout << "chamber " << i << endl;
-        cout << "      anode voltage : " << runinfo.anode_voltage[i] << endl;
-        cout << "      drift voltage : " << runinfo.drift_voltage[i] << endl;
-        cout << "               gain : " << runinfo.gain[i] << endl;
-        cout << "     drift velocity : " << runinfo.vdrift[i] << endl;
-        cout << "                ExB : " << runinfo.ExB[i] << endl;
+    if (d < 5) {
+        cout << "chamber " << d << endl;
+        cout << "      anode voltage : " << runinfo.anode_voltage[d] << endl;
+        cout << "      drift voltage : " << runinfo.drift_voltage[d] << endl;
+        cout << "               gain : " << runinfo.gain[d] << endl;
+        cout << "     drift velocity : " << runinfo.vdrift[d] << endl;
+        cout << "                ExB : " << runinfo.ExB[d] << endl;
+        cout << "  local_gain_factor : " << runinfo.local_gain_factor << endl;
+        cout << "  local_gain_factor : " << runinfo.local_gain_factor[d] << endl;
+        cout << "  local_gain_factor[0][0] : " << runinfo.local_gain_factor[d][0][0] << endl;
     }
 
-    myfile << i << ", " << runinfo.anode_voltage[i] << ", " << runinfo.drift_voltage[i] << ", " << runinfo.gain[i] << ", " << runinfo.vdrift[i] << ", " << runinfo.ExB[i] << std::endl;
+    chamber_info_file << d << ", " << runinfo.anode_voltage[d] << ", " << runinfo.drift_voltage[d] << ", " << runinfo.gain[d] << ", " << runinfo.vdrift[d] << ", " << runinfo.ExB[d] << std::endl;
+
+    for (int r=0; r<16; r++) {
+      local_gains_file << d << ", " << r;
+
+      for (int c=0; c<144; c++) {
+         local_gains_file << ", " << runinfo.local_gain_factor[d][r][c];
+      }
+      local_gains_file << std::endl;
+    }
   }
 
-  myfile.close();
+  chamber_info_file.close();
+  local_gains_file.close();
 }

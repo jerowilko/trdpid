@@ -20,6 +20,7 @@
 #include <AliTRDCalDCS.h>
 #include <AliTRDCalDCSv2.h>
 #include <AliCDBManager.h>
+#include <AliTRDCalDet.h>
 
 #endif
 
@@ -45,6 +46,8 @@ struct runinfo_t
 
   float anode_voltage[540];
   float drift_voltage[540];
+
+  float local_gain_factor[540][16][144];
 
   float gain[540];
   float vdrift[540];
@@ -209,6 +212,17 @@ void query(Int_t year=2016, Int_t run=265377)
   
   for (int i=0; i<540; i++) {
     runinfo.ExB[i] = exb->GetValue(i);
+  }
+
+  AliCDBEntry *entry = man->("TRD/Calib/LocalGainFactor", run)
+  AliTRDCalDet *exb = dynamic_cast<AliTRDCalDet*>entry->GetObject();
+
+  for (int i=0; i<540; i++) {
+    for (int j=0; j<16; j++) {
+      for (int k=0; k<144; k++) {
+        run_info.local_gain_factor[i][j][k] = det_cal_roc.GetValue(i,j,k);
+      }
+    }
   }
   
 

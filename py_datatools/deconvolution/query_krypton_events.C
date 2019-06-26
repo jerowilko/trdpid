@@ -82,9 +82,11 @@ void raw_analysis( TString infile = "/alice/data/2018/LHC18a/000283989/raw/18000
     while (reader->NextEvent()) {
         ievent++;
 
-        if (ievent > nev) break;
+        for (int det=0; det<540; det++) {
+            digMan->ClearArrays(det);
+        }
 
-        //digMan->ResetArrays();
+        if (ievent > nev) break;
 
         if (ievent % 10 == 0) {
             cout << "Event " << ievent << endl;
@@ -107,7 +109,6 @@ void raw_analysis( TString infile = "/alice/data/2018/LHC18a/000283989/raw/18000
         // ------------------------------------------------------------
         // ADC and TBsum spectra
         for (int det=0; det<540; det++) {
-
             AliTRDSignalIndex* idx = digMan->GetIndexes(det);
 
             if (!idx) continue;

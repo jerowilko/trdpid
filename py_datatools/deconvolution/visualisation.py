@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import py_datatools.deconvolution.deconvolute as deconvolute
 
-num_evts = 30
+num_evts = 5
 num_events_per_plot = 5
 num_skip = 8
 nbins = 30

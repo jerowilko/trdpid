@@ -16,4 +16,4 @@ default_num_tracklets_per_file = 9170
 default_minp = None
 default_maxp = None
 
-default_dataset = 'all_tracks_6_tracklets_valid_run_numbers'
+default_dataset = '6_tracklets_large_calib_even'

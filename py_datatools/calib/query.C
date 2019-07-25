@@ -44,6 +44,7 @@ struct runinfo_t
   float drift_voltage[540];
 
   float local_gain_factor[540][16][144];
+  float online_local_gain_factor[540][16][144];
 
   float gain[540];
   float vdrift[540];
@@ -61,8 +62,15 @@ void query(Int_t year=2016, Int_t run=265377)
     ofstream local_gains_file;
     local_gains_file.open(Form("calib_files/local_gains_%d_%d.txt", year, run));
 
+    ofstream online_local_gains_file;
+    local_gaonline_local_gains_fileins_file.open(Form("calib_files/online_local_gains_%d_%d.txt", year, run));
+
+    ofstream combined_local_gains_file;
+    combined_local_gains_file.open(Form("calib_files/combined_local_gains_%d_%d.txt", year, run));
+
   // set up the connection to the OCDB
   AliCDBManager* man = AliCDBManager::Instance();
+  AliTRDcalibDB* const calibration = AliTRDcalibDB::Instance();
 
   if (0) {
     man->SetDefaultStorage
@@ -157,13 +165,16 @@ void query(Int_t year=2016, Int_t run=265377)
 
   for (int d=0; d<540; d++) {
     AliTRDCalROC *det_cal_roc = loc->GetCalROC(d);
+    fCalOnlGainROC = calibration->GetOnlineGainTableROC(d);
     for (int r=0; r<16; r++) {
       for (int c=0; c<144; c++) {
-        if (r >= det_cal_roc->GetNrows()) {
-            runinfo.local_gain_factor[d][r][c] = 1.0;
-            continue;
-        }
+        runinfo.local_gain_factor[d][r][c] = 1.0;
+        runinfo.online_local_gain_factor[d][r][c] = 1.0;
+
+        if (r >= det_cal_roc->GetNrows()) continue;
+
         runinfo.local_gain_factor[d][r][c] = det_cal_roc->GetValue(c,r);
+        if (fCalOnlGainROC) runinfo.online_local_gain_factor[d][r][c] = fCalOnlGainROC->GetGainCorrectionFactor(r, c);
       }
     }
   }
@@ -189,16 +200,25 @@ void query(Int_t year=2016, Int_t run=265377)
 
     chamber_info_file << d << ", " << runinfo.anode_voltage[d] << ", " << runinfo.drift_voltage[d] << ", " << runinfo.gain[d] << ", " << runinfo.vdrift[d] << ", " << runinfo.ExB[d] << std::endl;
 
+
     for (int r=0; r<16; r++) {
       local_gains_file << d << ", " << r;
+      online_local_gains_file << d << ", " << r;
+      combined_local_gains_file << d << ", " << r;
 
       for (int c=0; c<144; c++) {
          local_gains_file << ", " << runinfo.local_gain_factor[d][r][c];
+         online_local_gains_file << ", " << runinfo.online_local_gain_factor[d][r][c];
+         combined_local_gains_file << ", " << runinfo.gain[d] * runinfo.local_gain_factor[d][r][c] / runinfo.online_local_gain_factor[d][r][c];
       }
       local_gains_file << std::endl;
+      online_local_gains_file << std::endl;
+      combined_local_gains_file << std::endl;
     }
   }
 
   chamber_info_file.close();
   local_gains_file.close();
+  online_local_gains_file.close();
+  combined_local_gains_file.close();
 }

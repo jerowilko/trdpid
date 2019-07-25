@@ -52,17 +52,11 @@ if __name__=='__main__':
 	tracks, info_sets = load_whole_named_dataset(dataset)
 	# tracks = tracks[:10]
 	impulse_response = np.load('py_datatools/deconvolution/impulse_response.npy')[2]
-	imp = np.zeros((impulse_response.shape[0], 30))
-	imp[:impulse_response.shape[0], :impulse_response.shape[1]] = impulse_response
-	imp = resample_unit_time(imp, 24)[:,:10]
 
-	plt.subplot(1, 2, 1)
-	plt.imshow(imp)
-	plt.subplot(1, 2, 2)
 	plt.imshow(impulse_response)
 	plt.show()
 
-	charge = deconvolve(tracks, imp)
+	charge = deconvolve(tracks, impulse_response)
 
 	charge = np.roll(charge, offset, axis=(2, 3))
 

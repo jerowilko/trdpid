@@ -11,7 +11,7 @@ bin_centres = bins[1:] - bins[0]
 vals = np.zeros(bins.shape[0] - 1)
 
 
-final_unit_shape = (5, 5, 12)
+final_unit_shape = (5, 5, 15)
 
 final_unit = np.zeros(final_unit_shape)
 N = 0
@@ -76,11 +76,11 @@ for i in range(num_evts):
 
         ### MAKE BETTER POSITION ESTIMATES BASED OFF WEIGHTED SUM.
 
-        positions = list(filter(lambda pos: 30 - pos[3] >= 9 and pos[3] >= 3, positions))
+        positions = list(filter(lambda pos: 30 - pos[3] >= 12 and pos[3] >= 3, positions))
         positions = list(filter(lambda pos: 144 - pos[2] >= 3 and pos[2] >= 3, positions))
         positions = list(filter(lambda pos: 16 - pos[1] >= 3 and pos[1] >= 3, positions))
 
-        units = [evt[pos[0], pos[1]-2:pos[1]+3:, pos[2]-2:pos[2]+3, pos[3]-3:pos[3]+9] for pos in positions]
+        units = [evt[pos[0], pos[1]-2:pos[1]+3:, pos[2]-2:pos[2]+3, pos[3]-3:pos[3]+12] for pos in positions]
 
         if show_plots:
             plt.show()
@@ -115,4 +115,4 @@ plt.imshow(final_unit[4])
 plt.colorbar()
 plt.show()
 
-np.save(os.path.dirname(__file__) + '/impulse_response.npy', final_unit)
+# np.save(os.path.dirname(__file__) + '/impulse_response.npy', final_unit)
